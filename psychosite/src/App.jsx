@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { loadContent, loadImages } from './content'
 import './App.css'
 
 const Star = ({ size = 50, color = 'currentColor' }) => (
@@ -89,11 +90,54 @@ function Loader({ onDone }) {
   )
 }
 
+/* ===== ANIMATED COUNTER ===== */
+function Counter({ end, suffix = '', duration = 2000 }) {
+  const [count, setCount] = useState(0)
+  const [started, setStarted] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setStarted(true); obs.unobserve(el) } },
+      { threshold: 0.3 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!started) return
+    const numEnd = parseInt(end, 10) || 0
+    let start = 0
+    const step = Math.ceil(numEnd / (duration / 16))
+    const timer = setInterval(() => {
+      start += step
+      if (start >= numEnd) { start = numEnd; clearInterval(timer) }
+      setCount(start)
+    }, 16)
+    return () => clearInterval(timer)
+  }, [started, end, duration])
+
+  return <span ref={ref}>{count}{suffix}</span>
+}
+
+/* ===== MULTILINE TEXT HELPER ===== */
+function Nl({ text }) {
+  return text.split('\n').map((line, i, arr) => (
+    <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>
+  ))
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [popup, setPopup] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const c = loadContent()
+  const img = loadImages()
 
   useEffect(() => {
     if (loading) document.body.style.overflow = 'hidden'
@@ -116,18 +160,15 @@ function App() {
           <div className="popup" onClick={e => e.stopPropagation()}>
             <button className="popup-close" onClick={() => setPopup(false)}>✕</button>
             <span className="star-spin"><Star size={30} color="var(--red)" /></span>
-            <h3>Придбати гайд</h3>
-            <p>62 сторінки. 5 блоків. Приклади, механізми, покрокові інструкції + бонус.</p>
-            <div className="popup-price">
-              <span className="popup-price-old">1200 ₴</span>
-              <span className="popup-price-new">799 ₴</span>
-            </div>
-            <form className="popup-form" onSubmit={e => { e.preventDefault(); alert('Дякую! Перевірте вашу пошту.'); setPopup(false) }}>
+            <h3>{c.popup.title}</h3>
+            <p>{c.popup.text}</p>
+            <form className="popup-form" onSubmit={e => { e.preventDefault(); alert('Дякую! Ми зв\u2019яжемося з вами найближчим часом.'); setPopup(false) }}>
               <input type="text" placeholder="Ваше ім'я" required />
               <input type="email" placeholder="Email" required />
-              <button type="submit" className="popup-submit">Оплатити та отримати</button>
+              <input type="tel" placeholder="Телефон" />
+              <button type="submit" className="popup-submit">{c.popup.btn}</button>
             </form>
-            <p className="popup-note">Миттєва доставка на email у PDF-форматі</p>
+            <p className="popup-note">{c.popup.note}</p>
           </div>
         </div>
       )}
@@ -135,12 +176,13 @@ function App() {
       {/* NAV */}
       <nav className="nav" style={scrolled ? { boxShadow: '0 2px 20px rgba(0,0,0,0.06)' } : {}}>
         <div className="nav-inner">
-          <div className="nav-logo">Леся <em>Матвєєва</em></div>
+          <div className="nav-logo">{c.nav.logo1} <em>{c.nav.logo2}</em></div>
           <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
-            <li><a href="#about" onClick={() => setMenuOpen(false)}>Про гайд</a></li>
-            <li><a href="#signs" onClick={() => setMenuOpen(false)}>Ознаки</a></li>
-            <li><a href="#results" onClick={() => setMenuOpen(false)}>Результат</a></li>
-            <li><button className="nav-cta" onClick={() => { setMenuOpen(false); setPopup(true) }}>Придбати</button></li>
+            <li><a href="#about" onClick={() => setMenuOpen(false)}>{c.nav.link1}</a></li>
+            <li><a href="#products" onClick={() => setMenuOpen(false)}>{c.nav.link2}</a></li>
+            <li><a href="#tv" onClick={() => setMenuOpen(false)}>{c.nav.link3}</a></li>
+            <li><a href="#contact" onClick={() => setMenuOpen(false)}>{c.nav.link4}</a></li>
+            <li><button className="nav-cta" onClick={() => { setMenuOpen(false); setPopup(true) }}>{c.nav.cta}</button></li>
           </ul>
           <button className="burger" onClick={() => setMenuOpen(!menuOpen)}><span /><span /><span /></button>
         </div>
@@ -149,171 +191,233 @@ function App() {
       {/* ===== HERO ===== */}
       <section className="hero">
         <div className="hero-left">
-          <div className="hero-tag-line">Психологічний гайд</div>
-          <h1>Гайд по<br />нарцисизму<span>від Лесі Матвєєвої</span></h1>
-          <p className="hero-subtitle">
-            Покрокова система розуміння, розпізнавання та відновлення.
-            Зрозумій механізми, побач ознаки, поверни себе.
-          </p>
+          <div className="hero-tag-line">{c.hero.tag}</div>
+          <h1>{c.hero.title}<span>{c.hero.subtitle}</span></h1>
+          <p className="hero-subtitle"><Nl text={c.hero.text} /></p>
+          <div className="hero-list">
+            <p>{c.hero.listTitle}</p>
+            <ul>
+              <li>{c.hero.list1}</li>
+              <li>{c.hero.list2}</li>
+              <li>{c.hero.list3}</li>
+            </ul>
+          </div>
           <div className="hero-actions">
-            <button onClick={() => setPopup(true)} className="hero-btn-red">Придбати гайд</button>
-            <a href="#about" className="hero-btn-ghost">Дізнатися більше ↓</a>
+            <button onClick={() => setPopup(true)} className="hero-btn-red">{c.hero.btn1}</button>
+            <a href="#products" className="hero-btn-ghost">{c.hero.btn2}</a>
           </div>
           <div className="hero-stats">
-            <div className="hero-stat"><div className="hero-stat-num">62</div><div className="hero-stat-label">сторінки</div></div>
-            <div className="hero-stat"><div className="hero-stat-num">5</div><div className="hero-stat-label">блоків</div></div>
-            <div className="hero-stat"><div className="hero-stat-num">10+</div><div className="hero-stat-label">ознак</div></div>
+            <div className="hero-stat"><div className="hero-stat-num">{c.hero.stat1num}</div><div className="hero-stat-label">{c.hero.stat1label}</div></div>
+            <div className="hero-stat"><div className="hero-stat-num">{c.hero.stat2num}</div><div className="hero-stat-label">{c.hero.stat2label}</div></div>
+            <div className="hero-stat"><div className="hero-stat-num">{c.hero.stat3num}</div><div className="hero-stat-label">{c.hero.stat3label}</div></div>
           </div>
           <div className="hero-star"><span className="star-spin"><Star size={70} color="rgba(255,255,255,0.9)" /></span></div>
         </div>
         <div className="hero-right">
-          <img src="/mainimg.JPG" alt="Леся Матвєєва" />
+          <img src={img.heroImage} alt={c.nav.logo1 + ' ' + c.nav.logo2} />
         </div>
       </section>
 
-      {/* ===== БЛОК 2: ДЛЯ КОГО ===== */}
-      <section className="s s-lg" id="about">
-        <div className="wrap">
-          <Reveal><h2 className="h2">Цей гайд<br /><em>для вас, якщо</em></h2></Reveal>
-          <Reveal delay={0.15}>
-            <div className="star-text">
-              <div className="star-text-icon"><span className="star-spin"><Star size={50} color="var(--red)" /></span></div>
-              <div className="star-text-body">
-                <p>Ви відчуваєте, що у стосунках щось не так, але не можете це пояснити. Вам здається, що ви постійно «недостатня». Після розмов з партнером ви почуваєтесь розгубленою, виснаженою, винною.</p>
-                <div className="statement">Цей гайд дає ясність. Не щоб поставити діагноз, а щоб повернути опору на власне сприйняття.</div>
+      {/* ===== БЛОК 2: ПРО ЛЕСЮ ===== */}
+      <section className="about-full" id="about">
+        <div className="about-full-image">
+          <img src={img.aboutImage} alt={c.about.title1 + ' ' + c.about.title2} />
+        </div>
+        <div className="about-full-content">
+          <Reveal><div className="tag">{c.about.tag}</div></Reveal>
+          <Reveal delay={0.1}><h2 className="h2">{c.about.title1}<br /><em>{c.about.title2}</em></h2></Reveal>
+          <Reveal delay={0.2}>
+            <div className="about-items">
+              <div className="about-item">
+                <div className="about-item-num">01</div>
+                <div><h4>{c.about.item1title}</h4><p>{c.about.item1text}</p></div>
+              </div>
+              <div className="about-item">
+                <div className="about-item-num">02</div>
+                <div><h4>{c.about.item2title}</h4><p>{c.about.item2text}</p></div>
+              </div>
+              <div className="about-item">
+                <div className="about-item-num">03</div>
+                <div><h4>{c.about.item3title}</h4><p>{c.about.item3text}</p></div>
               </div>
             </div>
           </Reveal>
-          <div className="divider" />
-          <Reveal>
-            <div className="audience-grid">
-              {[
-                { t: 'Ви у стосунках', d: 'і відчуваєте емоційні гойдалки, знецінення, контроль під виглядом турботи — але не розумієте, чи це нормально.', icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/> },
-                { t: 'Ви вийшли', d: 'зі стосунків, але досі відчуваєте потяг, провину, нав\'язливі думки й не можете рухатись далі.', icon: <path d="M18 6L6 18M6 6l12 12"/> },
-                { t: 'Ви хочете розпізнавати', d: 'токсичну динаміку на етапі знайомства, щоб більше не потрапляти в руйнівні стосунки.', icon: <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></> },
-              ].map((c, i) => (
-                <div className="audience-card" key={i}>
-                  <div className="audience-card-top">
-                    <div className="audience-card-num">0{i + 1}</div>
-                    <div className="audience-card-icon"><svg viewBox="0 0 24 24">{c.icon}</svg></div>
+        </div>
+      </section>
+
+      {/* ===== БЛОК 3: ПРОДУКТИ ===== */}
+      <section className="products-section" id="products">
+        <div className="products-header">
+          <Reveal><div className="tag">{c.products.tag}</div></Reveal>
+          <Reveal delay={0.1}><h2 className="h2">{c.products.title1}<br /><em>{c.products.title2}</em></h2></Reveal>
+          <Reveal delay={0.2}><p className="lead">{c.products.lead}</p></Reveal>
+        </div>
+
+        <div className="products-showcase">
+          {[
+            { img: img.product1Image, title: c.products.p1title, result: c.products.p1result, price: c.products.p1price, details: c.products.p1details, icon: <><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></> },
+            { img: img.product2Image, title: c.products.p2title, result: c.products.p2result, price: c.products.p2price, details: c.products.p2details, icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></> },
+            { img: img.product3Image, title: c.products.p3title, result: c.products.p3result, price: c.products.p3price, details: c.products.p3details, icon: <><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></> },
+          ].map((p, i) => (
+            <Reveal key={i} delay={i * 0.15}>
+              <div className={`product-row ${i % 2 !== 0 ? 'product-row-reverse' : ''}`}>
+                <div className="product-row-img">
+                  <img src={p.img} alt={p.title} />
+                  <div className="product-row-num">0{i + 1}</div>
+                </div>
+                <div className="product-row-body">
+                  <div className="product-row-icon"><svg viewBox="0 0 24 24">{p.icon}</svg></div>
+                  <h3>{p.title}</h3>
+                  <p className="product-row-desc">{p.result}</p>
+                  <div className="product-row-details">
+                    <span className="star-spin-fast"><Star size={10} color="var(--red)" /></span>
+                    <span>{p.details}</span>
                   </div>
-                  <h4>{c.t}</h4>
-                  <p>{c.d}</p>
-                  <div className="audience-card-line" />
+                  <div className="product-row-bottom">
+                    <div className="product-row-price">{p.price}</div>
+                    <button onClick={() => setPopup(true)} className="product-row-btn">{c.products.btn}</button>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </Reveal>
-          <div className="star-divider" style={{ margin: '4rem 0 3rem' }}><span className="star-spin-fast"><Star size={18} color="var(--red)" /></span></div>
-          <Reveal><h3 className="h3">У гайді — <em>5 блоків</em></h3></Reveal>
-          <Reveal delay={0.1}>
-            <div className="contents-grid" style={{ border: '1px solid rgba(0,0,0,0.06)', marginTop: '2rem' }}>
-              {[
-                { t: 'Поняття', d: 'Що таке нарцисизм, рівні, НРЛ — чітко і без зайвого.', icon: <><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></> },
-                { t: 'Ознаки у стосунках', d: 'Love bombing, газлайтинг, знецінення, контроль — з прикладами.', icon: <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></> },
-                { t: 'Динаміка циклу', d: 'Ідеалізація → знецінення → відкидання → повернення.', icon: <><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></> },
-                { t: 'Вплив на вас', d: '8 змін, які відбуваються з вашою психікою.', icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/> },
-                { t: 'Як собі допомогти', d: '7 конкретних кроків відновлення з поясненнями.', icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/> },
-                { t: 'Бонус', d: 'Як розпізнати нарциса на побаченні + фільми.', icon: <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/> },
-              ].map((c, i) => (
-                <div className="contents-item" key={i}>
-                  <h4>{c.t}</h4>
-                  <p>{c.d}</p>
-                  <div className="contents-item-icon"><svg viewBox="0 0 24 24">{c.icon}</svg></div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== БЛОК 4: ТЕЛЕПРОЄКТИ ===== */}
+      <section className="s s-lg" id="tv">
+        <div className="wrap-wide">
+          <Reveal><div className="tag">{c.tv.tag}</div></Reveal>
+          <Reveal delay={0.1}><h2 className="h2">{c.tv.title1}<br /><em>{c.tv.title2}</em></h2></Reveal>
+          <Reveal delay={0.2}><p className="lead">{c.tv.lead}</p></Reveal>
+
+          <Reveal delay={0.3}>
+            <div className="tv-grid">
+              <div className="tv-item">
+                <div className="tv-video">
+                  <iframe src={c.tv.v1url} title={c.tv.v1title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                 </div>
-              ))}
+                <h4>{c.tv.v1title}</h4>
+                <p>{c.tv.v1desc}</p>
+              </div>
+              <div className="tv-item">
+                <div className="tv-video">
+                  <iframe src={c.tv.v2url} title={c.tv.v2title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                </div>
+                <h4>{c.tv.v2title}</h4>
+                <p>{c.tv.v2desc}</p>
+              </div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ===== БЛОК 3: ЩО ВСЕРЕДИНІ — ВЕРТИКАЛЬНИЙ ТАЙМЛАЙН ===== */}
-      <section className="s s-lg" id="signs" style={{ background: 'var(--cream)' }}>
-        <div className="wrap">
-          <Reveal><div className="tag">Що всередині</div></Reveal>
-          <Reveal delay={0.1}><h2 className="h2">Ви навчитесь<br /><em>розпізнавати</em></h2></Reveal>
-          <Reveal delay={0.2}><p className="lead">Основні ознаки нарцисичної динаміки — з поясненням механізму та внутрішнім маркером.</p></Reveal>
-
-          <div className="timeline">
-            {[
-              { n: '01', title: 'Love bombing', text: 'Стрімке, захопливе зближення. Розмови про майбутнє з перших днів. Мета — швидко сформувати емоційну залежність.', inner: 'Легка втрата орієнтації — ніби ви не встигаєте зрозуміти, що відбувається.' },
-              { n: '02', title: '«Тепло — холод»', text: 'Після близькості раптово настає холод. Без причин. Рідкісне тепло закріплюється сильніше, ніж стабільне.', inner: 'Постійна напруга. Ви живете в очікуванні: коли знову стане тепло.' },
-              { n: '03', title: 'Газлайтинг', text: 'Систематична підміна фактів. Ви бачите одне — вам кажуть, що цього не було. «Ти надто чутлива».', inner: 'Ви перевіряєте листування, щоб переконатися, що вам не здалося.' },
-              { n: '04', title: 'Знецінення', text: 'Тонкі уколи під виглядом жартів. Ваші досягнення зменшуються, ваше «ні» не приймається спокійно.', inner: 'Ви все рідше кажете «ні», бо не хочете наслідків.' },
-              { n: '05', title: 'Перевертання відповідальності', text: 'Будь-який конфлікт — ваша вина. З часом ви автоматично шукаєте в собі причину.', inner: 'Хронічне почуття провини.' },
-            ].map((s, i) => (
-              <Reveal key={i} delay={i * 0.1}>
-                <div className="timeline-item">
-                  <div className="timeline-left">
-                    <div className="timeline-num">{s.n}</div>
-                    <div className="timeline-line" />
-                  </div>
-                  <div className="timeline-content">
-                    <h4>{s.title}</h4>
-                    <p>{s.text}</p>
-                    <div className="timeline-marker">
-                      <span className="star-spin-fast"><Star size={12} color="var(--red)" /></span>
-                      <p>{s.inner}</p>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
+      {/* ===== БЛОК 5: СТАТИСТИКА ===== */}
+      <section className="st" id="stats">
+        <div className="st-marquee">
+          <div className="st-marquee-track">
+            {[...Array(4)].map((_, r) => (
+              <span key={r} className="st-marquee-item">
+                Результати <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span> Досвід <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span> Довіра <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span>&nbsp;
+              </span>
             ))}
           </div>
-
-          <Reveal>
-            <div style={{ marginTop: '3rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span className="star-spin-fast"><Star size={20} color="var(--red)" /></span>
-              <div className="statement-red" style={{ margin: 0 }}>
-                У гайді — 10+ ознак з прикладами, порівнянням зі здоровими стосунками та поясненням «для чого він це робить».
-              </div>
-            </div>
-            <button onClick={() => setPopup(true)} className="btn-outline" style={{ marginTop: '2rem' }}>Отримати повний гайд</button>
-          </Reveal>
         </div>
-      </section>
 
-      {/* ===== БЛОК 4: РЕЗУЛЬТАТ (з фото) ===== */}
-      <section className="results-section" id="results">
-        <div className="results-content">
-          <Reveal><h2 className="h2">Після цього гайду<br /><em>ви зможете</em></h2></Reveal>
-          <Reveal delay={0.1}>
-            <div className="results-list">
-              {[
-                'Зрозуміти, що з вами відбувалось — і що причина не у вас',
-                'Розпізнавати маніпуляції, газлайтинг, знецінення',
-                'Побачити цикл: ідеалізація → знецінення → відкидання',
-                'Зрозуміти, чому так важко піти — і що це не любов',
-                'Отримати 7 кроків відновлення',
-                'Розпізнавати токсичну людину на першому побаченні',
-              ].map((item, i) => (
-                <div className="results-item" key={i}>
-                  <div className="results-check">✓</div>
-                  <p>{item}</p>
+        <div className="st-content">
+          {[
+            { end: c.stats.s1num, suffix: c.stats.s1suffix, label: c.stats.s1label, accent: c.stats.s1accent },
+            { end: c.stats.s2num, suffix: c.stats.s2suffix, label: c.stats.s2label, accent: c.stats.s2accent },
+            { end: c.stats.s3num, suffix: c.stats.s3suffix, label: c.stats.s3label, accent: c.stats.s3accent },
+          ].map((s, i) => (
+            <Reveal key={i} delay={i * 0.15}>
+              <div className="st-item">
+                <div className="st-item-left">
+                  <div className="st-num"><Counter end={s.end} suffix={s.suffix} duration={2500} /></div>
                 </div>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <div className="quote" style={{ marginTop: '2rem' }}>
-              <p><strong>62 сторінки.</strong> 5 блоків. Приклади, механізми, покрокові інструкції + бонус.</p>
-            </div>
-            <button onClick={() => setPopup(true)} className="btn-red" style={{ marginTop: '2rem' }}>Придбати гайд — 799 ₴</button>
-          </Reveal>
+                <div className="st-item-right">
+                  <div className="st-label">{s.label}</div>
+                  <div className="st-accent">{s.accent}</div>
+                </div>
+                <div className="st-item-hover-bg" />
+              </div>
+            </Reveal>
+          ))}
         </div>
-        <div className="results-image">
-          <img src="/secondimg.JPG" alt="" />
+
+        <div className="st-marquee st-marquee-reverse">
+          <div className="st-marquee-track">
+            {[...Array(4)].map((_, r) => (
+              <span key={r} className="st-marquee-item">
+                Результати <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span> Досвід <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span> Довіра <span className="st-marquee-star"><Star size={14} color="var(--red)" /></span>&nbsp;
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ===== БЛОК 5: CTA ===== */}
-      <div className="band-red" id="cta">
+      {/* ===== БЛОК 6: ОСОБИСТА КОНСУЛЬТАЦІЯ ===== */}
+      <div className="band-red" id="consultation">
         <span className="star-spin"><Star size={40} color="rgba(255,255,255,0.15)" /></span>
-        <h2 style={{ marginTop: '1.5rem' }}>Є одне головне —<br />зберегти себе</h2>
-        <p>Берегти свій час — означає берегти свою психіку.<br />Берегти свою психіку — означає берегти своє майбутнє.</p>
-        <button onClick={() => setPopup(true)} className="btn-white" style={{ marginTop: '2.5rem' }}>Придбати гайд</button>
+        <h2 style={{ marginTop: '1.5rem' }}><Nl text={c.consultation.title} /></h2>
+        <p><Nl text={c.consultation.text} /></p>
+        <button onClick={() => setPopup(true)} className="btn-white" style={{ marginTop: '2.5rem' }}>{c.consultation.btn}</button>
       </div>
 
+      {/* ===== БЛОК 7: FOOTER / КОНТАКТИ ===== */}
+      <footer className="ft" id="contact">
+        <div className="ft-bg-star"><span className="star-spin"><Star size={300} color="rgba(255,255,255,0.015)" /></span></div>
+        <div className="ft-bg-star ft-bg-star-2"><span className="star-spin-fast"><Star size={150} color="rgba(255,255,255,0.02)" /></span></div>
+
+        <Reveal>
+          <div className="ft-top">
+            <span className="star-spin-fast"><Star size={24} color="var(--red)" /></span>
+            <h2 className="ft-heading">{c.footer.name}</h2>
+            <p className="ft-tagline">{c.footer.tagline}</p>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <div className="ft-socials">
+            <a className="ft-social" href={c.footer.instagram} target="_blank" rel="noopener noreferrer">
+              <div className="ft-social-icon">
+                <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </div>
+              <span>Instagram</span>
+            </a>
+            <a className="ft-social" href={c.footer.telegram} target="_blank" rel="noopener noreferrer">
+              <div className="ft-social-icon">
+                <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              </div>
+              <span>Telegram</span>
+            </a>
+            <a className="ft-social" href={'mailto:' + c.footer.email}>
+              <div className="ft-social-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <span>Email</span>
+            </a>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.3}>
+          <div className="ft-nav">
+            <a href="#about">{c.nav.link1}</a>
+            <span className="ft-nav-dot" />
+            <a href="#products">{c.nav.link2}</a>
+            <span className="ft-nav-dot" />
+            <a href="#tv">{c.nav.link3}</a>
+            <span className="ft-nav-dot" />
+            <a href="#consultation">Консультація</a>
+          </div>
+        </Reveal>
+
+        <div className="ft-line" />
+
+        <div className="ft-bottom">
+          <p>{c.footer.copyright}</p>
+        </div>
+      </footer>
     </>
   )
 }
