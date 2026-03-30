@@ -9,6 +9,15 @@ export default function HeroSection({ content, images }) {
   return (
     <section className="hero" aria-label="Головний екран">
       <div className="hero-left">
+        <div className="hero-mobile-photo">
+          <Image
+            src={images.heroImage}
+            alt="Леся Матвєєва"
+            width={300}
+            height={300}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
         <div className="hero-tag-line">{c.tag}</div>
         <h1>{c.title}<span>{c.subtitle}</span></h1>
         <p className="hero-subtitle"><Nl text={c.text} /></p>
@@ -34,7 +43,7 @@ export default function HeroSection({ content, images }) {
           height={800}
           priority
           sizes="(max-width: 768px) 100vw, 50vw"
-          style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       </div>
     </section>

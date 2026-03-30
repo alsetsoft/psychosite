@@ -96,6 +96,9 @@
   min-height: 100vh;
   margin-top: 72px;
 }
+.hero-mobile-photo {
+  display: none;
+}
 .hero-left {
   background: var(--red);
   padding: 6rem 5rem 5rem 6rem;
@@ -1480,8 +1483,17 @@
   .nav-cta { display: none; }
   .burger { display: flex; }
   .hero { grid-template-columns: 1fr; margin-top: 64px; }
-  .hero-left { padding: 3.5rem 2rem 3rem; }
-  .hero-right { min-height: 350px; }
+  .hero-left { padding: 1rem 2rem 3rem; }
+  .hero-right { display: none; }
+  .hero-mobile-photo {
+    display: block;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 2rem;
+    border: 3px solid rgba(255,255,255,0.25);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
   .results-section { grid-template-columns: 1fr; }
   .results-content { padding: 4rem 1.5rem; }
   .results-image { min-height: 300px; }
