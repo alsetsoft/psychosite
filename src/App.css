@@ -101,7 +101,7 @@
 }
 .hero-left {
   background: var(--red);
-  padding: 6rem 5rem 5rem 6rem;
+  padding: 1rem 5rem 5rem 6rem;
   display: flex; flex-direction: column; justify-content: center;
   position: relative; overflow: hidden;
 }
@@ -1127,45 +1127,7 @@
   box-shadow: 0 8px 25px rgba(139,26,26,0.2);
 }
 
-/* ===== PRODUCTS MOBILE CAROUSEL ===== */
-.products-carousel {
-  overflow: hidden;
-  position: relative;
-  padding: 0 0 2rem;
-}
-.products-carousel-track {
-  display: flex;
-  transition: transform 0.4s ease;
-}
-.products-carousel-slide {
-  min-width: 100%;
-  padding: 0 1rem;
-  box-sizing: border-box;
-}
-.products-carousel-slide .product-row {
-  grid-template-columns: 1fr;
-}
-.products-carousel-slide .product-row-reverse {
-  direction: ltr;
-}
-.products-carousel-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-.products-carousel-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  border: 1px solid var(--red);
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.products-carousel-dot.active {
-  background: var(--red);
-}
+
 
 /* ===== TV / VIDEO CAROUSEL ===== */
 .tv-carousel-wrap {

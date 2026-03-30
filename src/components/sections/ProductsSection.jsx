@@ -1,4 +1,3 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import Star from '../Star'
 import Reveal from '../Reveal'
@@ -10,91 +9,8 @@ const icons = [
   <><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>,
 ]
 
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${breakpoint}px)`)
-    setIsMobile(mq.matches)
-    const handler = e => setIsMobile(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [breakpoint])
-  return isMobile
-}
-
-function ProductCard({ p, i, c }) {
-  return (
-    <div className={`product-row ${i % 2 !== 0 ? 'product-row-reverse' : ''}`}>
-      <div className="product-row-img">
-        <Image
-          src={p.img}
-          alt={p.title}
-          width={500}
-          height={600}
-          sizes="(max-width: 768px) 100vw, 33vw"
-          style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-        />
-        <div className="product-row-num">0{i + 1}</div>
-      </div>
-      <div className="product-row-body">
-        <div className="product-row-icon"><svg viewBox="0 0 24 24">{icons[i]}</svg></div>
-        <h3>{p.title}</h3>
-        <p className="product-row-desc">{p.result}</p>
-        <div className="product-row-details">
-          <span className="star-spin-fast"><Star size={10} color="var(--red)" /></span>
-          <span>{p.details}</span>
-        </div>
-        <div className="product-row-bottom">
-          <div className="product-row-price">{p.price}</div>
-          <PopupTrigger className="product-row-btn">{c.btn}</PopupTrigger>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function MobileCarousel({ products, content }) {
-  const [current, setCurrent] = useState(0)
-  const touchStart = useRef(null)
-
-  const go = useCallback((dir) => {
-    setCurrent(prev => Math.max(0, Math.min(products.length - 1, prev + dir)))
-  }, [products.length])
-
-  const onTouchStart = e => { touchStart.current = e.touches[0].clientX }
-  const onTouchEnd = e => {
-    if (touchStart.current === null) return
-    const diff = touchStart.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 50) go(diff > 0 ? 1 : -1)
-    touchStart.current = null
-  }
-
-  return (
-    <div className="products-carousel" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      <div className="products-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
-        {products.map((p, i) => (
-          <div className="products-carousel-slide" key={i}>
-            <ProductCard p={p} i={i} c={content} />
-          </div>
-        ))}
-      </div>
-      <div className="products-carousel-dots">
-        {products.map((_, i) => (
-          <button
-            key={i}
-            className={`products-carousel-dot ${i === current ? 'active' : ''}`}
-            onClick={() => setCurrent(i)}
-            aria-label={`Продукт ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export default function ProductsSection({ content, images }) {
   const c = content
-  const isMobile = useIsMobile()
 
   const products = [
     { img: images.product1Image, title: c.p1title, result: c.p1result, price: c.p1price, details: c.p1details },
@@ -110,17 +26,38 @@ export default function ProductsSection({ content, images }) {
         <Reveal delay={0.2}><p className="lead">{c.lead}</p></Reveal>
       </div>
 
-      {isMobile ? (
-        <MobileCarousel products={products} content={c} />
-      ) : (
-        <div className="products-showcase">
-          {products.map((p, i) => (
-            <Reveal key={i} delay={i * 0.15}>
-              <ProductCard p={p} i={i} c={c} />
-            </Reveal>
-          ))}
-        </div>
-      )}
+      <div className="products-showcase">
+        {products.map((p, i) => (
+          <Reveal key={i} delay={i * 0.15}>
+            <div className={`product-row ${i % 2 !== 0 ? 'product-row-reverse' : ''}`}>
+              <div className="product-row-img">
+                <Image
+                  src={p.img}
+                  alt={p.title}
+                  width={500}
+                  height={600}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                />
+                <div className="product-row-num">0{i + 1}</div>
+              </div>
+              <div className="product-row-body">
+                <div className="product-row-icon"><svg viewBox="0 0 24 24">{icons[i]}</svg></div>
+                <h3>{p.title}</h3>
+                <p className="product-row-desc">{p.result}</p>
+                <div className="product-row-details">
+                  <span className="star-spin-fast"><Star size={10} color="var(--red)" /></span>
+                  <span>{p.details}</span>
+                </div>
+                <div className="product-row-bottom">
+                  <div className="product-row-price">{p.price}</div>
+                  <PopupTrigger className="product-row-btn">{c.btn}</PopupTrigger>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
     </section>
   )
 }
