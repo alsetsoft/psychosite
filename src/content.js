@@ -25,9 +25,6 @@ export const defaults = {
     list3: 'і як повернути внутрішню опору',
     btn1: 'Стати учасницею',
     btn2: 'Купити \u2193',
-    stat1num: '7.04', stat1label: 'старт',
-    stat2num: '5+1', stat2label: 'зустрічей',
-    stat3num: '5', stat3label: 'учасниць',
   },
   about: {
     tag: 'Про мене',

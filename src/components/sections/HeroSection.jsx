@@ -24,11 +24,6 @@ export default function HeroSection({ content, images }) {
           <PopupTrigger className="hero-btn-red">{c.btn1}</PopupTrigger>
           <a href="#products" className="hero-btn-ghost">{c.btn2}</a>
         </div>
-        <div className="hero-stats">
-          <div className="hero-stat"><div className="hero-stat-num">{c.stat1num}</div><div className="hero-stat-label">{c.stat1label}</div></div>
-          <div className="hero-stat"><div className="hero-stat-num">{c.stat2num}</div><div className="hero-stat-label">{c.stat2label}</div></div>
-          <div className="hero-stat"><div className="hero-stat-num">{c.stat3num}</div><div className="hero-stat-label">{c.stat3label}</div></div>
-        </div>
         <div className="hero-star"><span className="star-spin"><Star size={70} color="rgba(255,255,255,0.9)" /></span></div>
       </div>
       <div className="hero-right">
