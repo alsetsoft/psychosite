@@ -1,5 +1,6 @@
+'use client'
 import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { loadContent, saveContent, loadImages, saveImages, resetAll } from './content.js'
 import './Admin.css'
 
@@ -110,7 +111,7 @@ function ImageUploader({ label, value, onChange }) {
 }
 
 function AdminPanel() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [content, setContent] = useState(loadContent)
   const [images, setImages] = useState(loadImages)
   const [activeSection, setActiveSection] = useState('hero')
@@ -144,7 +145,7 @@ function AdminPanel() {
 
   const handleLogout = () => {
     sessionStorage.removeItem(AUTH_KEY)
-    navigate('/admin')
+    router.push('/admin')
     window.location.reload()
   }
 
@@ -174,7 +175,7 @@ function AdminPanel() {
           </button>
         </nav>
         <div className="adm-side-bottom">
-          <a href="/public" target="_blank" rel="noopener noreferrer" className="adm-side-link">Переглянути сайт</a>
+          <a href="/" target="_blank" rel="noopener noreferrer" className="adm-side-link">Переглянути сайт</a>
           <button className="adm-side-logout" onClick={handleLogout}>Вийти</button>
         </div>
       </aside>
@@ -232,7 +233,7 @@ function AdminPanel() {
 }
 
 export default function Admin() {
-  const [authed, setAuthed] = useState(sessionStorage.getItem(AUTH_KEY) === '1')
+  const [authed, setAuthed] = useState(() => typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === '1')
   if (!authed) return <Login onAuth={() => setAuthed(true)} />
   return <AdminPanel />
 }

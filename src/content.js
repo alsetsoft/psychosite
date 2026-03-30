@@ -103,6 +103,7 @@ export const defaultImages = {
 }
 
 export function loadContent() {
+  if (typeof window === 'undefined') return { ...defaults }
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...defaults }
@@ -121,6 +122,7 @@ export function saveContent(data) {
 }
 
 export function loadImages() {
+  if (typeof window === 'undefined') return { ...defaultImages }
   try {
     const raw = localStorage.getItem(IMG_STORAGE_KEY)
     if (!raw) return { ...defaultImages }

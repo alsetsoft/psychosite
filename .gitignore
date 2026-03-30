@@ -12,6 +12,9 @@ dist
 .DS_Store
 Thumbs.db
 
+# Next.js
+.next/
+
 # Vite
 *.local
 
