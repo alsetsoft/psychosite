@@ -1240,7 +1240,7 @@
 .st-marquee-item {
   font-family: var(--sans); font-size: 0.7rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 5px;
-  color: rgba(255,255,255,0.12);
+  color: darkred;
   display: inline-flex; align-items: center; gap: 1.5rem;
   padding-right: 1.5rem;
 }
