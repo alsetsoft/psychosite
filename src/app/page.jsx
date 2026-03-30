@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { defaults, defaultImages } from '../content'
-import { fetchContent } from '../lib/supabase'
+import { fetchContent, fetchImages } from '../lib/supabase'
 import LoaderWrapper from '../components/LoaderWrapper'
 import PopupProvider from '../components/PopupProvider'
 import Nav from '../components/Nav'
@@ -17,9 +17,11 @@ import JsonLd from '../components/JsonLd'
 
 export default function HomePage() {
   const [content, setContent] = useState(defaults)
+  const [images, setImages] = useState(defaultImages)
 
   useEffect(() => {
     fetchContent().then(setContent)
+    fetchImages().then(imgs => { if (imgs) setImages(prev => ({ ...prev, ...imgs })) })
   }, [])
 
   return (
@@ -27,9 +29,9 @@ export default function HomePage() {
       <LoaderWrapper>
         <Nav content={content.nav} />
         <main>
-          <HeroSection content={content} images={defaultImages} />
-          <AboutSection content={content.about} images={defaultImages} />
-          <ProductsSection content={content.products} images={defaultImages} />
+          <HeroSection content={content} images={images} />
+          <AboutSection content={content.about} images={images} />
+          <ProductsSection content={content.products} images={images} />
           <TvSection content={content.tv} />
           <StatsSection content={content.stats} />
           <ConsultationSection content={content.consultation} />

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { defaults, defaultImages } from './content.js'
-import { supabase, fetchContent, saveContentToSupabase } from './lib/supabase'
+import { supabase, fetchContent, saveContentToSupabase, uploadImage, fetchImages } from './lib/supabase'
 import './Admin.css'
 
 function Login({ onAuth }) {
@@ -85,14 +85,20 @@ const imageLabels = {
   product3Image: 'Фото Продукт 3',
 }
 
-function ImageUploader({ label, value, onChange }) {
+function ImageUploader({ label, imageKey, value, onUploaded }) {
   const inputRef = useRef()
-  const handleFile = e => {
+  const [uploading, setUploading] = useState(false)
+  const handleFile = async e => {
     const file = e.target.files[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => onChange(ev.target.result)
-    reader.readAsDataURL(file)
+    setUploading(true)
+    try {
+      const url = await uploadImage(imageKey, file)
+      onUploaded(url)
+    } catch (err) {
+      alert('Помилка завантаження: ' + err.message)
+    }
+    setUploading(false)
   }
   return (
     <div className="adm-image-field">
@@ -101,7 +107,9 @@ function ImageUploader({ label, value, onChange }) {
         <img src={value} alt={label} />
       </div>
       <div className="adm-image-actions">
-        <button type="button" onClick={() => inputRef.current.click()}>Завантажити нове</button>
+        <button type="button" onClick={() => inputRef.current.click()} disabled={uploading}>
+          {uploading ? 'Завантаження...' : 'Завантажити нове'}
+        </button>
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
       </div>
     </div>
@@ -274,6 +282,7 @@ function AdminPanel() {
 
   useEffect(() => {
     fetchContent().then(setContent)
+    fetchImages().then(imgs => { if (imgs) setImages(prev => ({ ...prev, ...imgs })) })
   }, [])
 
   const updateField = (section, field, value) => {
@@ -364,9 +373,10 @@ function AdminPanel() {
               {Object.keys(imageLabels).map(key => (
                 <ImageUploader
                   key={key}
+                  imageKey={key}
                   label={imageLabels[key]}
                   value={images[key]}
-                  onChange={val => updateImage(key, val)}
+                  onUploaded={url => updateImage(key, url)}
                 />
               ))}
             </div>

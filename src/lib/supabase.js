@@ -23,6 +23,39 @@ export async function fetchContent() {
   return result
 }
 
+export async function uploadImage(key, file) {
+  const ext = file.name.split('.').pop()
+  const path = `${key}.${ext}`
+
+  // Remove old file with any extension
+  const { data: existing } = await supabase.storage.from('images').list('', { search: key })
+  if (existing?.length) {
+    await supabase.storage.from('images').remove(existing.map(f => f.name))
+  }
+
+  const { error } = await supabase.storage.from('images').upload(path, file, {
+    upsert: true,
+    cacheControl: '0',
+  })
+  if (error) throw error
+
+  const { data: urlData } = supabase.storage.from('images').getPublicUrl(path)
+  return urlData.publicUrl + '?t=' + Date.now()
+}
+
+export async function fetchImages() {
+  const { data: files, error } = await supabase.storage.from('images').list('', { limit: 100 })
+  if (error || !files?.length) return null
+
+  const images = {}
+  for (const file of files) {
+    const key = file.name.replace(/\.[^.]+$/, '')
+    const { data: urlData } = supabase.storage.from('images').getPublicUrl(file.name)
+    images[key] = urlData.publicUrl + '?t=' + file.updated_at
+  }
+  return images
+}
+
 export async function saveContentToSupabase(data) {
   const rows = []
   for (const section of Object.keys(data)) {
