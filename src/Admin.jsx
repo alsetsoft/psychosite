@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { defaults, loadContent, saveContent, loadImages, saveImages, resetAll } from './content'
+import { loadContent, saveContent, loadImages, saveImages, resetAll } from './content.js'
 import './Admin.css'
 
 const ADMIN_USER = 'admin'
@@ -174,7 +174,7 @@ function AdminPanel() {
           </button>
         </nav>
         <div className="adm-side-bottom">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="adm-side-link">Переглянути сайт</a>
+          <a href="/public" target="_blank" rel="noopener noreferrer" className="adm-side-link">Переглянути сайт</a>
           <button className="adm-side-logout" onClick={handleLogout}>Вийти</button>
         </div>
       </aside>

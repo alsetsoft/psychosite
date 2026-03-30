@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { loadContent, loadImages } from './content'
+import { loadContent, loadImages } from './content.js'
 import './App.css'
 
 const Star = ({ size = 50, color = 'currentColor' }) => (
