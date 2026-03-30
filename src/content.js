@@ -67,12 +67,6 @@ export const defaults = {
     title1: 'Виступи та',
     title2: 'телепроєкти',
     lead: 'Участь як експерт з психології у телевізійних та медіа проєктах.',
-    v1url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    v1title: 'Виступ на телебаченні',
-    v1desc: 'Експертний коментар з психології стосунків',
-    v2url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    v2title: 'Участь у проєкті',
-    v2desc: 'Розбір тем самооцінки та кордонів',
   },
   stats: {
     s1num: '500', s1suffix: '+', s1label: 'клієнтів', s1accent: 'довірили свій шлях',

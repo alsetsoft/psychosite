@@ -1,25 +1,28 @@
 'use client'
-import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useRef, useEffect } from 'react'
 import { loadContent, saveContent, loadImages, saveImages, resetAll } from './content.js'
+import { supabase } from './lib/supabase'
 import './Admin.css'
 
-const ADMIN_USER = 'admin'
-const ADMIN_PASS = 'admin123'
-const AUTH_KEY = 'admin_auth'
-
 function Login({ onAuth }) {
-  const [user, setUser] = useState('')
+  const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault()
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      sessionStorage.setItem(AUTH_KEY, '1')
-      onAuth()
+    setLoading(true)
+    setError('')
+    const { error: err } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    })
+    setLoading(false)
+    if (err) {
+      setError('Невірний email або пароль')
     } else {
-      setError('Невірний логін або пароль')
+      onAuth()
     }
   }
 
@@ -29,9 +32,9 @@ function Login({ onAuth }) {
         <h1>Адмін-панель</h1>
         <p>Увійдіть, щоб редагувати сайт</p>
         {error && <div className="adm-error">{error}</div>}
-        <input type="text" placeholder="Логін" value={user} onChange={e => setUser(e.target.value)} autoFocus />
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} autoFocus />
         <input type="password" placeholder="Пароль" value={pass} onChange={e => setPass(e.target.value)} />
-        <button type="submit">Увійти</button>
+        <button type="submit" disabled={loading}>{loading ? 'Вхід...' : 'Увійти'}</button>
       </form>
     </div>
   )
@@ -69,8 +72,6 @@ const fieldLabels = {
   p1title: 'Продукт 1 назва', p1result: 'Продукт 1 результат', p1price: 'Продукт 1 ціна', p1details: 'Продукт 1 деталі',
   p2title: 'Продукт 2 назва', p2result: 'Продукт 2 результат', p2price: 'Продукт 2 ціна', p2details: 'Продукт 2 деталі',
   p3title: 'Продукт 3 назва', p3result: 'Продукт 3 результат', p3price: 'Продукт 3 ціна', p3details: 'Продукт 3 деталі',
-  v1url: 'Відео 1 URL (YouTube embed)', v1title: 'Відео 1 назва', v1desc: 'Відео 1 опис',
-  v2url: 'Відео 2 URL (YouTube embed)', v2title: 'Відео 2 назва', v2desc: 'Відео 2 опис',
   s1num: 'Число 1', s1suffix: 'Суфікс 1', s1label: 'Підпис 1', s1accent: 'Акцент 1',
   s2num: 'Число 2', s2suffix: 'Суфікс 2', s2label: 'Підпис 2', s2accent: 'Акцент 2',
   s3num: 'Число 3', s3suffix: 'Суфікс 3', s3label: 'Підпис 3', s3accent: 'Акцент 3',
@@ -110,8 +111,112 @@ function ImageUploader({ label, value, onChange }) {
   )
 }
 
+function VideoManager() {
+  const [videos, setVideos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    supabase.from('videos').select('*').order('sort_order').then(({ data }) => {
+      if (data) setVideos(data)
+      setLoading(false)
+    })
+  }, [])
+
+  const updateVideo = (idx, field, value) => {
+    setVideos(prev => prev.map((v, i) => i === idx ? { ...v, [field]: value } : v))
+  }
+
+  const addVideo = () => {
+    setVideos(prev => [...prev, {
+      id: null,
+      title: '',
+      description: '',
+      youtube_url: '',
+      sort_order: prev.length + 1,
+    }])
+  }
+
+  const removeVideo = async (idx) => {
+    const video = videos[idx]
+    if (video.id) {
+      await supabase.from('videos').delete().eq('id', video.id)
+    }
+    setVideos(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  const moveVideo = (idx, dir) => {
+    const next = idx + dir
+    if (next < 0 || next >= videos.length) return
+    setVideos(prev => {
+      const arr = [...prev]
+      ;[arr[idx], arr[next]] = [arr[next], arr[idx]]
+      return arr.map((v, i) => ({ ...v, sort_order: i + 1 }))
+    })
+  }
+
+  const saveVideos = async () => {
+    setSaving(true)
+    for (const v of videos) {
+      if (v.id) {
+        await supabase.from('videos').update({
+          title: v.title,
+          description: v.description,
+          youtube_url: v.youtube_url,
+          sort_order: v.sort_order,
+        }).eq('id', v.id)
+      } else {
+        const { data } = await supabase.from('videos').insert({
+          title: v.title,
+          description: v.description,
+          youtube_url: v.youtube_url,
+          sort_order: v.sort_order,
+        }).select()
+        if (data?.[0]) v.id = data[0].id
+      }
+    }
+    setSaving(false)
+  }
+
+  if (loading) return <p>Завантаження відео...</p>
+
+  return (
+    <div className="adm-videos">
+      <h3 style={{ marginBottom: '1rem' }}>Відео</h3>
+      {videos.map((v, i) => (
+        <div key={v.id || i} className="adm-video-row">
+          <div className="adm-video-fields">
+            <div className="adm-field">
+              <label>Назва</label>
+              <input type="text" value={v.title} onChange={e => updateVideo(i, 'title', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>Опис</label>
+              <input type="text" value={v.description} onChange={e => updateVideo(i, 'description', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>YouTube URL</label>
+              <input type="text" value={v.youtube_url} onChange={e => updateVideo(i, 'youtube_url', e.target.value)} />
+            </div>
+          </div>
+          <div className="adm-video-actions">
+            <button type="button" onClick={() => moveVideo(i, -1)} disabled={i === 0} title="Up">&#8593;</button>
+            <button type="button" onClick={() => moveVideo(i, 1)} disabled={i === videos.length - 1} title="Down">&#8595;</button>
+            <button type="button" onClick={() => removeVideo(i)} className="adm-btn-delete" title="Delete">&#10005;</button>
+          </div>
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+        <button type="button" className="adm-btn-save" onClick={addVideo}>+ Додати відео</button>
+        <button type="button" className="adm-btn-save" onClick={saveVideos} disabled={saving}>
+          {saving ? 'Збереження...' : 'Зберегти відео'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function AdminPanel() {
-  const router = useRouter()
   const [content, setContent] = useState(loadContent)
   const [images, setImages] = useState(loadImages)
   const [activeSection, setActiveSection] = useState('hero')
@@ -143,9 +248,8 @@ function AdminPanel() {
     setSaved(false)
   }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem(AUTH_KEY)
-    router.push('/admin')
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
     window.location.reload()
   }
 
@@ -224,6 +328,7 @@ function AdminPanel() {
                   )}
                 </div>
               ))}
+              {activeSection === 'tv' && <VideoManager />}
             </div>
           )}
         </div>
@@ -233,7 +338,23 @@ function AdminPanel() {
 }
 
 export default function Admin() {
-  const [authed, setAuthed] = useState(() => typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === '1')
+  const [authed, setAuthed] = useState(false)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthed(!!session)
+      setChecking(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthed(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (checking) return null
   if (!authed) return <Login onAuth={() => setAuthed(true)} />
   return <AdminPanel />
 }
