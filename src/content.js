@@ -1,6 +1,3 @@
-const STORAGE_KEY = 'site_content'
-const IMG_STORAGE_KEY = 'site_images'
-
 export const defaults = {
   nav: {
     logo1: 'Леся',
@@ -84,7 +81,7 @@ export const defaults = {
     instagram: 'https://instagram.com',
     telegram: 'https://t.me',
     email: 'hello@lesyamatveyeva.com',
-    copyright: '\u00a9 2025 Леся Матвєєва. Усі права захищені.',
+    copyright: '© 2026 Леся Матвєєва. Усі права захищені.',
   },
 }
 
@@ -96,39 +93,3 @@ export const defaultImages = {
   product3Image: '/mainimg.JPG',
 }
 
-export function loadContent() {
-  if (typeof window === 'undefined') return { ...defaults }
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { ...defaults }
-    const saved = JSON.parse(raw)
-    // merge with defaults so new fields always exist
-    const merged = {}
-    for (const section of Object.keys(defaults)) {
-      merged[section] = { ...defaults[section], ...saved[section] }
-    }
-    return merged
-  } catch { return { ...defaults } }
-}
-
-export function saveContent(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-}
-
-export function loadImages() {
-  if (typeof window === 'undefined') return { ...defaultImages }
-  try {
-    const raw = localStorage.getItem(IMG_STORAGE_KEY)
-    if (!raw) return { ...defaultImages }
-    return { ...defaultImages, ...JSON.parse(raw) }
-  } catch { return { ...defaultImages } }
-}
-
-export function saveImages(data) {
-  localStorage.setItem(IMG_STORAGE_KEY, JSON.stringify(data))
-}
-
-export function resetAll() {
-  localStorage.removeItem(STORAGE_KEY)
-  localStorage.removeItem(IMG_STORAGE_KEY)
-}

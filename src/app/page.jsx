@@ -1,4 +1,8 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { defaults, defaultImages } from '../content'
+import { fetchContent } from '../lib/supabase'
 import LoaderWrapper from '../components/LoaderWrapper'
 import PopupProvider from '../components/PopupProvider'
 import Nav from '../components/Nav'
@@ -12,21 +16,27 @@ import FooterSection from '../components/sections/FooterSection'
 import JsonLd from '../components/JsonLd'
 
 export default function HomePage() {
+  const [content, setContent] = useState(defaults)
+
+  useEffect(() => {
+    fetchContent().then(setContent)
+  }, [])
+
   return (
-    <PopupProvider content={defaults.popup}>
+    <PopupProvider content={content.popup}>
       <LoaderWrapper>
-        <Nav content={defaults.nav} />
+        <Nav content={content.nav} />
         <main>
-          <HeroSection content={defaults} images={defaultImages} />
-          <AboutSection content={defaults.about} images={defaultImages} />
-          <ProductsSection content={defaults.products} images={defaultImages} />
-          <TvSection content={defaults.tv} />
-          <StatsSection content={defaults.stats} />
-          <ConsultationSection content={defaults.consultation} />
+          <HeroSection content={content} images={defaultImages} />
+          <AboutSection content={content.about} images={defaultImages} />
+          <ProductsSection content={content.products} images={defaultImages} />
+          <TvSection content={content.tv} />
+          <StatsSection content={content.stats} />
+          <ConsultationSection content={content.consultation} />
         </main>
-        <FooterSection content={{ footer: defaults.footer, nav: defaults.nav }} />
+        <FooterSection content={{ footer: content.footer, nav: content.nav }} />
       </LoaderWrapper>
-      <JsonLd content={defaults} />
+      <JsonLd content={content} />
     </PopupProvider>
   )
 }

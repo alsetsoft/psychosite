@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { loadContent, saveContent, loadImages, saveImages, resetAll } from './content.js'
-import { supabase } from './lib/supabase'
+import { defaults, defaultImages } from './content.js'
+import { supabase, fetchContent, saveContentToSupabase } from './lib/supabase'
 import './Admin.css'
 
 function Login({ onAuth }) {
@@ -217,11 +217,16 @@ function VideoManager() {
 }
 
 function AdminPanel() {
-  const [content, setContent] = useState(loadContent)
-  const [images, setImages] = useState(loadImages)
+  const [content, setContent] = useState(defaults)
+  const [images, setImages] = useState(defaultImages)
   const [activeSection, setActiveSection] = useState('hero')
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [showImages, setShowImages] = useState(false)
+
+  useEffect(() => {
+    fetchContent().then(setContent)
+  }, [])
 
   const updateField = (section, field, value) => {
     setContent(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }))
@@ -233,18 +238,19 @@ function AdminPanel() {
     setSaved(false)
   }
 
-  const handleSave = () => {
-    saveContent(content)
-    saveImages(images)
+  const handleSave = async () => {
+    setSaving(true)
+    await saveContentToSupabase(content)
+    setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!window.confirm('Скинути всі зміни до стандартних значень?')) return
-    resetAll()
-    setContent(loadContent())
-    setImages(loadImages())
+    await saveContentToSupabase(defaults)
+    setContent({ ...defaults })
+    setImages({ ...defaultImages })
     setSaved(false)
   }
 
@@ -290,8 +296,8 @@ function AdminPanel() {
           <h1>{showImages ? 'Зображення' : sectionLabels[activeSection]}</h1>
           <div className="adm-header-actions">
             <button className="adm-btn-reset" onClick={handleReset}>Скинути все</button>
-            <button className="adm-btn-save" onClick={handleSave}>
-              {saved ? 'Збережено!' : 'Зберегти'}
+            <button className="adm-btn-save" onClick={handleSave} disabled={saving}>
+              {saving ? 'Збереження...' : saved ? 'Збережено!' : 'Зберегти'}
             </button>
           </div>
         </header>
