@@ -1033,7 +1033,7 @@
 }
 .product-row {
   display: grid; grid-template-columns: 1fr 1fr;
-  min-height: 420px; background: var(--white);
+  height: 480px; background: var(--white);
   border: 1px solid rgba(0,0,0,0.04);
   overflow: hidden;
   transition: box-shadow 0.5s, transform 0.4s;
@@ -1046,6 +1046,7 @@
 .product-row-reverse > * { direction: ltr; }
 .product-row-img {
   overflow: hidden; position: relative;
+  min-height: 420px;
 }
 .product-row-img img {
   width: 100%; height: 100%; object-fit: cover;
@@ -1427,7 +1428,7 @@
   .nrl-card:last-child { border-bottom: none; }
   .about-full { grid-template-columns: 1fr; }
   .about-full-image { min-height: 400px; }
-  .product-row { grid-template-columns: 1fr; }
+  .product-row { grid-template-columns: 1fr; height: auto; }
   .product-row-reverse { direction: ltr; }
   .product-row-img { min-height: 280px; }
   .tv-nav-left { left: -10px; }
@@ -1480,7 +1481,7 @@
   .about-full-content { padding: 3rem 1.5rem; order: 1; }
   .products-header { padding: 4rem 1.5rem 2rem; }
   .products-showcase { padding: 0 1.5rem 4rem; }
-  .product-row { grid-template-columns: 1fr; }
+  .product-row { grid-template-columns: 1fr; height: auto; }
   .product-row-reverse { direction: ltr; }
   .product-row-img { min-height: 250px; }
   .product-row-body { padding: 2rem 1.5rem; }

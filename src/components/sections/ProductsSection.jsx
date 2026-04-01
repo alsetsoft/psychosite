@@ -34,10 +34,9 @@ export default function ProductsSection({ content, images }) {
                 <Image
                   src={p.img}
                   alt={p.title}
-                  width={500}
-                  height={600}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  style={{ objectFit: 'cover' }}
                 />
                 <div className="product-row-num">0{i + 1}</div>
               </div>

@@ -15,7 +15,7 @@ const montserrat = Montserrat({
 })
 
 export const metadata = {
-  metadataBase: new URL('https://example.com'),
+  metadataBase: new URL('https://lesya-matveyeva.com'),
   title: {
     default: 'Леся Матвєєва — Психолог, Психоаналітик',
     template: '%s | Леся Матвєєва',
@@ -25,7 +25,7 @@ export const metadata = {
   openGraph: {
     title: 'Леся Матвєєва — Психолог, Психоаналітик',
     description: 'Практичний психолог, психоаналітик, консультант з особистісного розвитку. Менторські групи, воркшопи, індивідуальні консультації.',
-    url: 'https://example.com',
+    url: 'https://lesya-matveyeva.com',
     siteName: 'Леся Матвєєва',
     images: [{ url: '/mainimg.JPG', width: 1200, height: 630 }],
     locale: 'uk_UA',
@@ -38,7 +38,7 @@ export const metadata = {
     images: ['/mainimg.JPG'],
   },
   alternates: {
-    canonical: 'https://example.com',
+    canonical: 'https://lesya-matveyeva.com',
   },
   icons: { icon: '/vite.svg' },
 }
