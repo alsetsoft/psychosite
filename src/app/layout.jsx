@@ -27,7 +27,6 @@ export const metadata = {
     description: 'Практичний психолог, психоаналітик, консультант з особистісного розвитку. Менторські групи, воркшопи, індивідуальні консультації.',
     url: 'https://lesya-matveyeva.com',
     siteName: 'Леся Матвєєва',
-    images: [{ url: '/mainimg.JPG', width: 1200, height: 630 }],
     locale: 'uk_UA',
     type: 'website',
   },
@@ -35,12 +34,11 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Леся Матвєєва — Психолог, Психоаналітик',
     description: 'Практичний психолог, психоаналітик, консультант з особистісного розвитку.',
-    images: ['/mainimg.JPG'],
   },
   alternates: {
     canonical: 'https://lesya-matveyeva.com',
   },
-  icons: { icon: '/vite.svg' },
+  icons: { icon: '/favicon.svg' },
 }
 
 export default function RootLayout({ children }) {
