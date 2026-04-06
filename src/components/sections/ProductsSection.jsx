@@ -9,14 +9,10 @@ const icons = [
   <><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></>,
 ]
 
-export default function ProductsSection({ content, images }) {
+export default function ProductsSection({ content, products }) {
   const c = content
 
-  const products = [
-    { img: images.product1Image, title: c.p1title, result: c.p1result, price: c.p1price, details: c.p1details },
-    { img: images.product2Image, title: c.p2title, result: c.p2result, price: c.p2price, details: c.p2details },
-    { img: images.product3Image, title: c.p3title, result: c.p3result, price: c.p3price, details: c.p3details },
-  ]
+  if (!products || products.length === 0) return null
 
   return (
     <section className="products-section" id="products" aria-label="Продукти">
@@ -28,11 +24,11 @@ export default function ProductsSection({ content, images }) {
 
       <div className="products-showcase">
         {products.map((p, i) => (
-          <Reveal key={i} delay={i * 0.15}>
+          <Reveal key={p.id || i} delay={i * 0.15}>
             <div className={`product-row ${i % 2 !== 0 ? 'product-row-reverse' : ''}`}>
               <div className="product-row-img">
                 <Image
-                  src={p.img}
+                  src={p.image_url || '/mainimg.JPG'}
                   alt={p.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -41,7 +37,7 @@ export default function ProductsSection({ content, images }) {
                 <div className="product-row-num">0{i + 1}</div>
               </div>
               <div className="product-row-body">
-                <div className="product-row-icon"><svg viewBox="0 0 24 24">{icons[i]}</svg></div>
+                <div className="product-row-icon"><svg viewBox="0 0 24 24">{icons[i % 3]}</svg></div>
                 <h3>{p.title}</h3>
                 <p className="product-row-desc">{p.result}</p>
                 <div className="product-row-details">
@@ -50,7 +46,11 @@ export default function ProductsSection({ content, images }) {
                 </div>
                 <div className="product-row-bottom">
                   <div className="product-row-price">{p.price}</div>
-                  <PopupTrigger className="product-row-btn">{c.btn}</PopupTrigger>
+                  {p.buy_url ? (
+                    <a href={p.buy_url} target="_blank" rel="noopener noreferrer" className="product-row-btn">{c.btn}</a>
+                  ) : (
+                    <PopupTrigger className="product-row-btn">{c.btn}</PopupTrigger>
+                  )}
                 </div>
               </div>
             </div>

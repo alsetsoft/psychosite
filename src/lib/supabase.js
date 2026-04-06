@@ -56,6 +56,11 @@ export async function fetchImages() {
   return images
 }
 
+export async function fetchSiteProducts() {
+  const { data } = await supabase.from('site_products').select('*').order('sort_order')
+  return data || []
+}
+
 export async function saveContentToSupabase(data) {
   const rows = []
   for (const section of Object.keys(data)) {

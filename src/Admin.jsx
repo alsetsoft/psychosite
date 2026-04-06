@@ -74,9 +74,6 @@ const fieldLabels = {
   priceLabel: 'Заголовок ціни', period1: 'Період 1', price1: 'Ціна 1',
   period2: 'Період 2', price2: 'Ціна 2',
   btnUrl: 'URL кнопки',
-  p1title: 'Продукт 1 назва', p1result: 'Продукт 1 результат', p1price: 'Продукт 1 ціна', p1details: 'Продукт 1 деталі',
-  p2title: 'Продукт 2 назва', p2result: 'Продукт 2 результат', p2price: 'Продукт 2 ціна', p2details: 'Продукт 2 деталі',
-  p3title: 'Продукт 3 назва', p3result: 'Продукт 3 результат', p3price: 'Продукт 3 ціна', p3details: 'Продукт 3 деталі',
   s1num: 'Число 1', s1suffix: 'Суфікс 1', s1label: 'Підпис 1', s1accent: 'Акцент 1',
   s2num: 'Число 2', s2suffix: 'Суфікс 2', s2label: 'Підпис 2', s2accent: 'Акцент 2',
   s3num: 'Число 3', s3suffix: 'Суфікс 3', s3label: 'Підпис 3', s3accent: 'Акцент 3',
@@ -88,9 +85,6 @@ const fieldLabels = {
 const imageLabels = {
   heroImage: 'Головне фото (Hero)',
   aboutImage: 'Фото "Про мене"',
-  product1Image: 'Фото Продукт 1',
-  product2Image: 'Фото Продукт 2',
-  product3Image: 'Фото Продукт 3',
 }
 
 function ImageUploader({ label, imageKey, value, onUploaded }) {
@@ -223,6 +217,140 @@ function VideoManager() {
         <button type="button" className="adm-btn-save" onClick={addVideo}>+ Додати відео</button>
         <button type="button" className="adm-btn-save" onClick={saveVideos} disabled={saving}>
           {saving ? 'Збереження...' : 'Зберегти відео'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ProductsManager() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    supabase.from('site_products').select('*').order('sort_order').then(({ data }) => {
+      if (data) setProducts(data)
+      setLoading(false)
+    })
+  }, [])
+
+  const updateProduct = (idx, field, value) => {
+    setProducts(prev => prev.map((p, i) => i === idx ? { ...p, [field]: value } : p))
+  }
+
+  const addProduct = () => {
+    setProducts(prev => [...prev, {
+      id: null,
+      title: '',
+      result: '',
+      price: '',
+      details: '',
+      buy_url: '',
+      image_url: '',
+      sort_order: prev.length + 1,
+    }])
+  }
+
+  const removeProduct = async (idx) => {
+    const product = products[idx]
+    if (product.id) {
+      await supabase.from('site_products').delete().eq('id', product.id)
+    }
+    setProducts(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  const moveProduct = (idx, dir) => {
+    const next = idx + dir
+    if (next < 0 || next >= products.length) return
+    setProducts(prev => {
+      const arr = [...prev]
+      ;[arr[idx], arr[next]] = [arr[next], arr[idx]]
+      return arr.map((p, i) => ({ ...p, sort_order: i + 1 }))
+    })
+  }
+
+  const handleImageUpload = async (idx, file) => {
+    const key = `site_product_${Date.now()}`
+    try {
+      const url = await uploadImage(key, file)
+      updateProduct(idx, 'image_url', url)
+    } catch (err) {
+      alert('Помилка завантаження: ' + err.message)
+    }
+  }
+
+  const saveProducts = async () => {
+    setSaving(true)
+    for (const p of products) {
+      const payload = {
+        title: p.title,
+        result: p.result,
+        price: p.price,
+        details: p.details,
+        buy_url: p.buy_url,
+        image_url: p.image_url,
+        sort_order: p.sort_order,
+      }
+      if (p.id) {
+        await supabase.from('site_products').update(payload).eq('id', p.id)
+      } else {
+        const { data } = await supabase.from('site_products').insert(payload).select()
+        if (data?.[0]) p.id = data[0].id
+      }
+    }
+    setSaving(false)
+  }
+
+  if (loading) return <p>Завантаження продуктів...</p>
+
+  return (
+    <div className="adm-videos">
+      <h3 style={{ marginBottom: '1rem' }}>Продукти</h3>
+      {products.map((p, i) => (
+        <div key={p.id || i} className="adm-video-row" style={{ alignItems: 'flex-start' }}>
+          <div className="adm-video-fields">
+            <div className="adm-field">
+              <label>Назва</label>
+              <input type="text" value={p.title} onChange={e => updateProduct(i, 'title', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>Результат</label>
+              <input type="text" value={p.result} onChange={e => updateProduct(i, 'result', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>Ціна</label>
+              <input type="text" value={p.price} onChange={e => updateProduct(i, 'price', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>Деталі</label>
+              <input type="text" value={p.details} onChange={e => updateProduct(i, 'details', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>URL кнопки "Купити"</label>
+              <input type="text" value={p.buy_url} onChange={e => updateProduct(i, 'buy_url', e.target.value)} placeholder="https://..." />
+            </div>
+            <div className="adm-field">
+              <label>Зображення</label>
+              {p.image_url && (
+                <div className="adm-image-preview" style={{ marginBottom: '0.5rem' }}>
+                  <img src={p.image_url} alt={p.title} />
+                </div>
+              )}
+              <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleImageUpload(i, e.target.files[0]) }} />
+            </div>
+          </div>
+          <div className="adm-video-actions">
+            <button type="button" onClick={() => moveProduct(i, -1)} disabled={i === 0} title="Up">&#8593;</button>
+            <button type="button" onClick={() => moveProduct(i, 1)} disabled={i === products.length - 1} title="Down">&#8595;</button>
+            <button type="button" onClick={() => removeProduct(i)} className="adm-btn-delete" title="Delete">&#10005;</button>
+          </div>
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+        <button type="button" className="adm-btn-save" onClick={addProduct}>+ Додати продукт</button>
+        <button type="button" className="adm-btn-save" onClick={saveProducts} disabled={saving}>
+          {saving ? 'Збереження...' : 'Зберегти продукти'}
         </button>
       </div>
     </div>
@@ -409,6 +537,7 @@ function AdminPanel() {
                 </div>
               ))}
               {activeSection === 'tv' && <VideoManager />}
+              {activeSection === 'products' && <ProductsManager />}
             </div>
           )}
         </div>

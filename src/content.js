@@ -66,18 +66,6 @@ export const defaults = {
     title1: 'Мої',
     title2: 'продукти',
     lead: 'Кожен продукт \u2014 це інструмент для роботи з собою. Обирайте те, що відгукується саме зараз.',
-    p1title: 'Група \u00abВільна\u00bb',
-    p1result: 'Повернути внутрішню опору та зрозуміти свої сценарії',
-    p1price: 'Старт 7 квітня',
-    p1details: '5 зустрічей + 1 особиста сесія',
-    p2title: 'Воркшоп \u00abКордони\u00bb',
-    p2result: 'Навчитись говорити \u00abні\u00bb та зберігати себе у стосунках',
-    p2price: 'Найближчий потік',
-    p2details: 'Інтенсив з практичними завданнями',
-    p3title: 'Особиста сесія',
-    p3result: 'Індивідуальна робота з вашим запитом у безпечному просторі',
-    p3price: 'За записом',
-    p3details: '60 хвилин глибинної роботи',
     btn: 'Купити',
   },
   tv: {
@@ -109,8 +97,5 @@ export const defaults = {
 export const defaultImages = {
   heroImage: '/mainimg.JPG',
   aboutImage: '/secondimg.JPG',
-  product1Image: '/mainimg.JPG',
-  product2Image: '/secondimg.JPG',
-  product3Image: '/mainimg.JPG',
 }
 
