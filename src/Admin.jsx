@@ -87,7 +87,12 @@ const imageLabels = {
   aboutImage: 'Фото "Про мене"',
 }
 
-function ImageUploader({ label, imageKey, value, onUploaded }) {
+const imageHints = {
+  heroImage: 'Рекомендовано: 1200×1600 px, портретна орієнтація (3:4)',
+  aboutImage: 'Рекомендовано: 1200×1600 px, портретна орієнтація (3:4)',
+}
+
+function ImageUploader({ label, imageKey, value, onUploaded, hint }) {
   const inputRef = useRef()
   const [uploading, setUploading] = useState(false)
   const handleFile = async e => {
@@ -114,6 +119,7 @@ function ImageUploader({ label, imageKey, value, onUploaded }) {
         </button>
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
       </div>
+      {hint && <p className="adm-image-hint">{hint}</p>}
     </div>
   )
 }
@@ -303,6 +309,7 @@ function ProductsManager({ products, setProducts }) {
                 </div>
               )}
               <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleImageUpload(i, e.target.files[0]) }} />
+              <p className="adm-image-hint">Рекомендовано: 800×600 px, альбомна орієнтація (4:3)</p>
             </div>
           </div>
           <div className="adm-video-actions">
@@ -496,6 +503,7 @@ function AdminPanel() {
                   label={imageLabels[key]}
                   value={images[key]}
                   onUploaded={url => updateImage(key, url)}
+                  hint={imageHints[key]}
                 />
               ))}
             </div>

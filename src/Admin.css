@@ -294,3 +294,8 @@
 .adm-video-actions button:hover { background: #f0f0f0; }
 .adm-video-actions .adm-btn-delete { color: #c0392b; border-color: #e6b0aa; }
 .adm-video-actions .adm-btn-delete:hover { background: #fde8e8; }
+.adm-image-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
