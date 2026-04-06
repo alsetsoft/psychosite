@@ -1434,15 +1434,10 @@ a.btn-white {
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   z-index: 1;
 }
-.mf-item-icon {
-  font-size: 1.6rem;
-  display: block;
-  margin-bottom: 0.5rem;
-}
 .mf-item-num {
   font-family: var(--serif); font-size: 2rem; font-weight: 700;
-  color: var(--red); opacity: 0.12; line-height: 1;
-  margin-bottom: 0.8rem;
+  color: var(--red); opacity: 0.15; line-height: 1;
+  margin-bottom: 1rem; display: block;
 }
 .mf-item p {
   font-size: 0.9rem; color: var(--dark); line-height: 1.7; font-weight: 500;
