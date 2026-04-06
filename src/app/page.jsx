@@ -8,6 +8,9 @@ import PopupProvider from '../components/PopupProvider'
 import Nav from '../components/Nav'
 import HeroSection from '../components/sections/HeroSection'
 import AboutSection from '../components/sections/AboutSection'
+import MarathonProgramSection from '../components/sections/MarathonProgramSection'
+import MarathonFormatSection from '../components/sections/MarathonFormatSection'
+import SelfEsteemSection from '../components/sections/SelfEsteemSection'
 import ProductsSection from '../components/sections/ProductsSection'
 import TvSection from '../components/sections/TvSection'
 import StatsSection from '../components/sections/StatsSection'
@@ -31,6 +34,9 @@ export default function HomePage() {
         <main>
           <HeroSection content={content} images={images} />
           <AboutSection content={content.about} images={images} />
+          <MarathonProgramSection content={content.marathon_program} />
+          <MarathonFormatSection content={content.marathon_format} />
+          <SelfEsteemSection content={content.self_esteem} ctaContent={content.marathon_cta} />
           <ProductsSection content={content.products} images={images} />
           <TvSection content={content.tv} />
           <StatsSection content={content.stats} />

@@ -45,6 +45,10 @@ const sectionLabels = {
   popup: 'Попап (форма)',
   hero: 'Перший екран',
   about: 'Про мене',
+  marathon_program: 'Програма Марафону',
+  marathon_format: 'Формат Марафону',
+  self_esteem: 'Самооцінка',
+  marathon_cta: 'Ціни Марафону / CTA',
   products: 'Продукти',
   tv: 'Телепроєкти',
   stats: 'Статистика',
@@ -59,13 +63,18 @@ const fieldLabels = {
   title: 'Заголовок', text: 'Текст', btn: 'Кнопка', note: 'Примітка',
   tag: 'Тег', title1: 'Заголовок (рядок 1)', title2: 'Заголовок (рядок 2)',
   subtitle: 'Підзаголовок',
-  listTitle: 'Заголовок списку',
-  list1: 'Пункт 1', list2: 'Пункт 2', list3: 'Пункт 3',
-  btn1: 'Кнопка 1', btn2: 'Кнопка 2',
   item1title: 'Блок 1 заголовок', item1text: 'Блок 1 текст',
   item2title: 'Блок 2 заголовок', item2text: 'Блок 2 текст',
   item3title: 'Блок 3 заголовок', item3text: 'Блок 3 текст',
   lead: 'Опис',
+  day1title: 'День 1 заголовок', day1list: 'День 1 список',
+  day2title: 'День 2 заголовок', day2list: 'День 2 список',
+  item1: 'Пункт 1', item2: 'Пункт 2', item3: 'Пункт 3', item4: 'Пункт 4',
+  text1: 'Текст 1', text2: 'Текст 2', text3: 'Текст 3',
+  youtubeUrl: 'YouTube URL',
+  priceLabel: 'Заголовок ціни', period1: 'Період 1', price1: 'Ціна 1',
+  period2: 'Період 2', price2: 'Ціна 2',
+  btnUrl: 'URL кнопки',
   p1title: 'Продукт 1 назва', p1result: 'Продукт 1 результат', p1price: 'Продукт 1 ціна', p1details: 'Продукт 1 деталі',
   p2title: 'Продукт 2 назва', p2result: 'Продукт 2 результат', p2price: 'Продукт 2 ціна', p2details: 'Продукт 2 деталі',
   p3title: 'Продукт 3 назва', p3result: 'Продукт 3 результат', p3price: 'Продукт 3 ціна', p3details: 'Продукт 3 деталі',
@@ -316,7 +325,7 @@ function AdminPanel() {
     window.location.reload()
   }
 
-  const isLongField = key => key.includes('text') || key === 'text' || key === 'lead' || key === 'title' || key === 'copyright'
+  const isLongField = key => key.includes('text') || key === 'text' || key === 'lead' || key === 'title' || key === 'copyright' || key.includes('list') || key === 'note'
 
   return (
     <div className="adm">
