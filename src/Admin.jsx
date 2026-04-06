@@ -71,7 +71,6 @@ const fieldLabels = {
   day2title: 'День 2 заголовок', day2list: 'День 2 список',
   item1: 'Пункт 1', item2: 'Пункт 2', item3: 'Пункт 3', item4: 'Пункт 4',
   text1: 'Текст 1', text2: 'Текст 2', text3: 'Текст 3',
-  youtubeUrl: 'YouTube URL',
   priceLabel: 'Заголовок ціни', period1: 'Період 1', price1: 'Ціна 1',
   period2: 'Період 2', price2: 'Ціна 2',
   btnUrl: 'URL кнопки',
