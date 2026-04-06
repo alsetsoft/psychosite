@@ -223,18 +223,7 @@ function VideoManager() {
   )
 }
 
-function ProductsManager() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    supabase.from('site_products').select('*').order('sort_order').then(({ data }) => {
-      if (data) setProducts(data)
-      setLoading(false)
-    })
-  }, [])
-
+function ProductsManager({ products, setProducts }) {
   const updateProduct = (idx, field, value) => {
     setProducts(prev => prev.map((p, i) => i === idx ? { ...p, [field]: value } : p))
   }
@@ -280,30 +269,6 @@ function ProductsManager() {
     }
   }
 
-  const saveProducts = async () => {
-    setSaving(true)
-    for (const p of products) {
-      const payload = {
-        title: p.title,
-        result: p.result,
-        price: p.price,
-        details: p.details,
-        buy_url: p.buy_url,
-        image_url: p.image_url,
-        sort_order: p.sort_order,
-      }
-      if (p.id) {
-        await supabase.from('site_products').update(payload).eq('id', p.id)
-      } else {
-        const { data } = await supabase.from('site_products').insert(payload).select()
-        if (data?.[0]) p.id = data[0].id
-      }
-    }
-    setSaving(false)
-  }
-
-  if (loading) return <p>Завантаження продуктів...</p>
-
   return (
     <div className="adm-videos">
       <h3 style={{ marginBottom: '1rem' }}>Продукти</h3>
@@ -347,11 +312,8 @@ function ProductsManager() {
           </div>
         </div>
       ))}
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+      <div style={{ marginTop: '1rem' }}>
         <button type="button" className="adm-btn-save" onClick={addProduct}>+ Додати продукт</button>
-        <button type="button" className="adm-btn-save" onClick={saveProducts} disabled={saving}>
-          {saving ? 'Збереження...' : 'Зберегти продукти'}
-        </button>
       </div>
     </div>
   )
@@ -415,10 +377,14 @@ function AdminPanel() {
   const [saving, setSaving] = useState(false)
   const [showImages, setShowImages] = useState(false)
   const [showSubmissions, setShowSubmissions] = useState(false)
+  const [products, setProducts] = useState([])
 
   useEffect(() => {
     fetchContent().then(setContent)
     fetchImages().then(imgs => { if (imgs) setImages(prev => ({ ...prev, ...imgs })) })
+    supabase.from('site_products').select('*').order('sort_order').then(({ data }) => {
+      if (data) setProducts(data)
+    })
   }, [])
 
   const updateField = (section, field, value) => {
@@ -434,6 +400,23 @@ function AdminPanel() {
   const handleSave = async () => {
     setSaving(true)
     await saveContentToSupabase(content)
+    for (const p of products) {
+      const payload = {
+        title: p.title,
+        result: p.result,
+        price: p.price,
+        details: p.details,
+        buy_url: p.buy_url,
+        image_url: p.image_url,
+        sort_order: p.sort_order,
+      }
+      if (p.id) {
+        await supabase.from('site_products').update(payload).eq('id', p.id)
+      } else {
+        const { data } = await supabase.from('site_products').insert(payload).select()
+        if (data?.[0]) p.id = data[0].id
+      }
+    }
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -537,7 +520,7 @@ function AdminPanel() {
                 </div>
               ))}
               {activeSection === 'tv' && <VideoManager />}
-              {activeSection === 'products' && <ProductsManager />}
+              {activeSection === 'products' && <ProductsManager products={products} setProducts={setProducts} />}
             </div>
           )}
         </div>
