@@ -28,7 +28,7 @@ export default function HomeContent({ content, images, products }) {
           <ProductsSection content={content.products} products={products} />
           <TvSection content={content.tv} />
           <StatsSection content={content.stats} />
-          <ConsultationSection content={content.consultation} />
+          <ConsultationSection content={content.consultation} ctaUrl={content.nav.ctaUrl} />
         </main>
         <FooterSection content={{ footer: content.footer, nav: content.nav }} />
       </LoaderWrapper>

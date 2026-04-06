@@ -21,7 +21,11 @@ export default function Nav({ content }) {
           <li><a href="#products" onClick={() => setMenuOpen(false)}>{content.link2}</a></li>
           <li><a href="#tv" onClick={() => setMenuOpen(false)}>{content.link3}</a></li>
           <li><a href="#contact" onClick={() => setMenuOpen(false)}>{content.link4}</a></li>
-          <li><PopupTrigger className="nav-cta">{content.cta}</PopupTrigger></li>
+          <li>{content.ctaUrl ? (
+            <a href={content.ctaUrl} target="_blank" rel="noopener noreferrer" className="nav-cta">{content.cta}</a>
+          ) : (
+            <PopupTrigger className="nav-cta">{content.cta}</PopupTrigger>
+          )}</li>
         </ul>
         <button className="burger" onClick={() => setMenuOpen(!menuOpen)}><span /><span /><span /></button>
       </div>

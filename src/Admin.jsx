@@ -59,7 +59,7 @@ const sectionLabels = {
 const fieldLabels = {
   logo1: 'Логотип (ім\'я)', logo2: 'Логотип (прізвище)',
   link1: 'Посилання 1', link2: 'Посилання 2', link3: 'Посилання 3', link4: 'Посилання 4',
-  cta: 'Кнопка CTA',
+  cta: 'Кнопка CTA', ctaUrl: 'URL кнопки CTA',
   title: 'Заголовок', text: 'Текст', btn: 'Кнопка', note: 'Примітка',
   tag: 'Тег', title1: 'Заголовок (рядок 1)', title2: 'Заголовок (рядок 2)',
   subtitle: 'Підзаголовок',

@@ -77,15 +77,17 @@
   letter-spacing: 2px; transition: all 0.3s; font-family: var(--sans);
 }
 .nav-links a:hover { opacity: 1; color: var(--red); }
-.nav-cta {
+.nav-cta,
+a.nav-cta {
   display: inline-block;
   padding: 0.6rem 1.8rem;
   background: var(--red); color: var(--white);
   font-family: var(--sans); font-size: 0.65rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 2px;
   text-decoration: none; transition: background 0.3s;
+  opacity: 1;
 }
-.nav-cta:hover { background: var(--red-deep); }
+.nav-cta:hover, a.nav-cta:hover { background: var(--red-deep); color: var(--white); opacity: 1; }
 .burger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
 .burger span { width: 24px; height: 2px; background: var(--dark); transition: all 0.3s; }
 
@@ -867,11 +869,13 @@
 .btn-red:hover { background: var(--red-deep); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139,26,26,0.2); }
 
 /* ===== BTN WHITE ===== */
-.btn-white {
+.btn-white,
+a.btn-white {
   display: inline-block; padding: 1.3rem 3rem;
   background: var(--white); color: var(--red);
   font-family: var(--sans); font-size: 0.8rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 3px;
+  text-decoration: none;
   border: none; cursor: pointer; transition: all 0.3s;
 }
 .btn-white:hover { background: var(--cream); transform: translateY(-2px); }

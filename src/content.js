@@ -7,6 +7,7 @@ export const defaults = {
     link3: 'Телепроєкти',
     link4: 'Контакти',
     cta: 'Стати учасницею',
+    ctaUrl: '',
   },
   popup: {
     title: 'Стати учасницею',
