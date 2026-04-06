@@ -11,13 +11,13 @@ function extractVideoId(url) {
   return null
 }
 
-function VideoSlide({ video }) {
+function VideoSlide({ video, animClass, onAnimationEnd }) {
   const [playing, setPlaying] = useState(false)
   const videoId = extractVideoId(video.youtube_url)
   if (!videoId) return null
 
   return (
-    <div className="tv-slide">
+    <div className={`tv-slide ${animClass}`} onAnimationEnd={onAnimationEnd}>
       <div className="tv-thumb">
         {playing ? (
           <iframe
@@ -51,9 +51,22 @@ function VideoSlide({ video }) {
 export default function TvSection({ content, videos = [] }) {
   const c = content
   const [current, setCurrent] = useState(0)
+  const [direction, setDirection] = useState(null)
+  const [animating, setAnimating] = useState(false)
 
-  const prev = () => setCurrent(i => (i > 0 ? i - 1 : videos.length - 1))
-  const next = () => setCurrent(i => (i < videos.length - 1 ? i + 1 : 0))
+  const goTo = (index, dir) => {
+    if (animating || index === current) return
+    setDirection(dir)
+    setAnimating(true)
+    setCurrent(index)
+  }
+
+  const prev = () => goTo(current > 0 ? current - 1 : videos.length - 1, 'left')
+  const next = () => goTo(current < videos.length - 1 ? current + 1 : 0, 'right')
+
+  const animClass = animating && direction
+    ? direction === 'right' ? 'tv-slide-enter-left' : 'tv-slide-enter-right'
+    : ''
 
   return (
     <section className="s s-lg" id="tv" aria-label="Телепроєкти">
@@ -66,14 +79,18 @@ export default function TvSection({ content, videos = [] }) {
           <Reveal delay={0.3}>
             <div className="tv-carousel-wrap">
               <button className="tv-nav tv-nav-left" onClick={prev} aria-label="Previous">&#8249;</button>
-              <VideoSlide key={videos[current].id} video={videos[current]} />
+              <VideoSlide
+                video={videos[current]}
+                animClass={animClass}
+                onAnimationEnd={() => setAnimating(false)}
+              />
               <button className="tv-nav tv-nav-right" onClick={next} aria-label="Next">&#8250;</button>
               <div className="tv-dots">
                 {videos.map((_, i) => (
                   <button
                     key={i}
                     className={`tv-dot ${i === current ? 'active' : ''}`}
-                    onClick={() => setCurrent(i)}
+                    onClick={() => goTo(i, i > current ? 'right' : 'left')}
                     aria-label={`Video ${i + 1}`}
                   />
                 ))}

@@ -1172,6 +1172,20 @@ a.btn-white {
   background: var(--dark);
   border-color: var(--dark);
 }
+.tv-slide.tv-slide-enter-left {
+  animation: tvSlideFromRight 0.35s ease-out;
+}
+.tv-slide.tv-slide-enter-right {
+  animation: tvSlideFromLeft 0.35s ease-out;
+}
+@keyframes tvSlideFromRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes tvSlideFromLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
 
 /* ===== STATS — MARQUEE + ROWS ===== */
 .st {
