@@ -1,7 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Reveal from '../Reveal'
-import { supabase } from '../../lib/supabase'
 
 function extractVideoId(url) {
   if (!url) return null
@@ -49,20 +48,9 @@ function VideoSlide({ video }) {
   )
 }
 
-export default function TvSection({ content }) {
+export default function TvSection({ content, videos = [] }) {
   const c = content
-  const [videos, setVideos] = useState([])
   const [current, setCurrent] = useState(0)
-
-  useEffect(() => {
-    supabase
-      .from('videos')
-      .select('*')
-      .order('sort_order')
-      .then(({ data }) => {
-        if (data) setVideos(data)
-      })
-  }, [])
 
   const prev = () => setCurrent(i => (i > 0 ? i - 1 : videos.length - 1))
   const next = () => setCurrent(i => (i < videos.length - 1 ? i + 1 : 0))
