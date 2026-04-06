@@ -1369,6 +1369,7 @@ a.btn-white {
 }
 
 /* ===== MARATHON PROGRAM ===== */
+.s.mp, .s.mf, .s.se { padding-top: 3rem; padding-bottom: 3rem; }
 .mp-wrap {
   max-width: 1100px; margin: 0 auto;
 }
