@@ -1,8 +1,7 @@
 import Reveal from '../Reveal'
-import AboutSection from './AboutSection'
 import MarathonCtaBlock from './MarathonCtaBlock'
 
-export default function SelfEsteemSection({ content, ctaContent, aboutContent, images }) {
+export default function SelfEsteemSection({ content, ctaContent }) {
   const c = content
 
   return (
@@ -16,7 +15,6 @@ export default function SelfEsteemSection({ content, ctaContent, aboutContent, i
             <p className="se-text">{c.text3}</p>
           </div>
         </Reveal>
-        <AboutSection content={aboutContent} images={images} />
         <MarathonCtaBlock content={ctaContent} />
       </div>
     </section>
