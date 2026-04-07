@@ -1582,8 +1582,8 @@ a.btn-white {
   .hero-right { display: none; }
   .hero-mobile-photo {
     display: block;
-    width: 180px; height: 180px;
-    border-radius: 50%;
+    width: 260px; height: 260px;
+    border-radius: 12px;
     overflow: hidden;
     margin: 0 auto 2rem;
     border: 3px solid rgba(255,255,255,0.25);
