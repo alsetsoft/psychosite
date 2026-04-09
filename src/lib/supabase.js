@@ -66,6 +66,11 @@ export async function fetchVideos() {
   return data || []
 }
 
+export async function fetchMarathonDays() {
+  const { data } = await supabase.from('marathon_days').select('*').order('sort_order')
+  return data || []
+}
+
 export async function saveContentToSupabase(data) {
   const rows = []
   for (const section of Object.keys(data)) {

@@ -66,8 +66,6 @@ const fieldLabels = {
   item2title: 'Блок 2 заголовок', item2text: 'Блок 2 текст',
   item3title: 'Блок 3 заголовок', item3text: 'Блок 3 текст',
   lead: 'Опис',
-  day1title: 'День 1 заголовок', day1list: 'День 1 список',
-  day2title: 'День 2 заголовок', day2list: 'День 2 список',
   item1: 'Пункт 1', item2: 'Пункт 2', item3: 'Пункт 3', item4: 'Пункт 4',
   text1: 'Текст 1', text2: 'Текст 2', text3: 'Текст 3',
   priceLabel: 'Заголовок ціни', period1: 'Період 1', price1: 'Ціна 1',
@@ -327,6 +325,101 @@ function ProductsManager({ products, setProducts }) {
   )
 }
 
+function MarathonDaysManager() {
+  const [days, setDays] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    supabase.from('marathon_days').select('*').order('sort_order').then(({ data }) => {
+      if (data) setDays(data)
+      setLoading(false)
+    })
+  }, [])
+
+  const updateDay = (idx, field, value) => {
+    setDays(prev => prev.map((d, i) => i === idx ? { ...d, [field]: value } : d))
+  }
+
+  const addDay = () => {
+    setDays(prev => [...prev, {
+      id: null,
+      title: '',
+      list_items: '',
+      sort_order: prev.length + 1,
+    }])
+  }
+
+  const removeDay = async (idx) => {
+    const day = days[idx]
+    if (day.id) {
+      await supabase.from('marathon_days').delete().eq('id', day.id)
+    }
+    setDays(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  const moveDay = (idx, dir) => {
+    const next = idx + dir
+    if (next < 0 || next >= days.length) return
+    setDays(prev => {
+      const arr = [...prev]
+      ;[arr[idx], arr[next]] = [arr[next], arr[idx]]
+      return arr.map((d, i) => ({ ...d, sort_order: i + 1 }))
+    })
+  }
+
+  const saveDays = async () => {
+    setSaving(true)
+    for (const d of days) {
+      const payload = {
+        title: d.title,
+        list_items: d.list_items,
+        sort_order: d.sort_order,
+      }
+      if (d.id) {
+        await supabase.from('marathon_days').update(payload).eq('id', d.id)
+      } else {
+        const { data } = await supabase.from('marathon_days').insert(payload).select()
+        if (data?.[0]) d.id = data[0].id
+      }
+    }
+    setSaving(false)
+  }
+
+  if (loading) return <p>Завантаження днів марафону...</p>
+
+  return (
+    <div className="adm-videos">
+      <h3 style={{ marginBottom: '1rem' }}>Дні марафону</h3>
+      {days.map((d, i) => (
+        <div key={d.id || i} className="adm-video-row">
+          <div className="adm-video-fields">
+            <div className="adm-field">
+              <label>Заголовок дня</label>
+              <input type="text" value={d.title} onChange={e => updateDay(i, 'title', e.target.value)} />
+            </div>
+            <div className="adm-field">
+              <label>Пункти (кожен з нового рядка)</label>
+              <textarea value={d.list_items} onChange={e => updateDay(i, 'list_items', e.target.value)} rows={6} />
+            </div>
+          </div>
+          <div className="adm-video-actions">
+            <button type="button" onClick={() => moveDay(i, -1)} disabled={i === 0} title="Up">&#8593;</button>
+            <button type="button" onClick={() => moveDay(i, 1)} disabled={i === days.length - 1} title="Down">&#8595;</button>
+            <button type="button" onClick={() => removeDay(i)} className="adm-btn-delete" title="Delete">&#10005;</button>
+          </div>
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+        <button type="button" className="adm-btn-save" onClick={addDay}>+ Додати день</button>
+        <button type="button" className="adm-btn-save" onClick={saveDays} disabled={saving}>
+          {saving ? 'Збереження...' : 'Зберегти дні'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function AdminPanel() {
   const [content, setContent] = useState(defaults)
   const [images, setImages] = useState(defaultImages)
@@ -469,6 +562,7 @@ function AdminPanel() {
                   )}
                 </div>
               ))}
+              {activeSection === 'marathon_program' && <MarathonDaysManager />}
               {activeSection === 'tv' && <VideoManager />}
               {activeSection === 'products' && <ProductsManager products={products} setProducts={setProducts} />}
             </div>
@@ -484,13 +578,25 @@ export default function Admin() {
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthed(!!session)
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        supabase.auth.signOut()
+        setAuthed(false)
+      } else {
+        setAuthed(!!session)
+      }
       setChecking(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthed(!!session)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED' && !session) {
+        supabase.auth.signOut()
+        setAuthed(false)
+      } else if (event === 'SIGNED_OUT') {
+        setAuthed(false)
+      } else {
+        setAuthed(!!session)
+      }
     })
 
     return () => subscription.unsubscribe()

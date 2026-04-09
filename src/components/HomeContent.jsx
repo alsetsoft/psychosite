@@ -14,14 +14,14 @@ import StatsSection from './sections/StatsSection'
 import ConsultationSection from './sections/ConsultationSection'
 import FooterSection from './sections/FooterSection'
 
-export default function HomeContent({ content, images, products, videos }) {
+export default function HomeContent({ content, images, products, videos, marathonDays }) {
   return (
     <PopupProvider content={content.popup}>
       <LoaderWrapper>
         <Nav content={content.nav} />
         <main>
           <HeroSection content={content} images={images} />
-          <MarathonProgramSection content={content.marathon_program} />
+          <MarathonProgramSection content={content.marathon_program} marathonDays={marathonDays} />
           <MarathonFormatSection content={content.marathon_format} />
           <SelfEsteemSection ctaContent={content.marathon_cta} />
           <AboutSection content={content.about} images={images} />
