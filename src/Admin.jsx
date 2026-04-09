@@ -47,7 +47,6 @@ const sectionLabels = {
   about: 'Про мене',
   marathon_program: 'Програма Марафону',
   marathon_format: 'Формат Марафону',
-  self_esteem: 'Самооцінка',
   marathon_cta: 'Ціни Марафону / CTA',
   products: 'Продукти',
   tv: 'Телепроєкти',
@@ -326,56 +325,6 @@ function ProductsManager({ products, setProducts }) {
   )
 }
 
-function SubmissionsManager() {
-  const [submissions, setSubmissions] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    supabase.from('submissions').select('*').order('created_at', { ascending: false }).then(({ data }) => {
-      if (data) setSubmissions(data)
-      setLoading(false)
-    })
-  }, [])
-
-  const removeSubmission = async (id) => {
-    await supabase.from('submissions').delete().eq('id', id)
-    setSubmissions(prev => prev.filter(s => s.id !== id))
-  }
-
-  if (loading) return <p>Завантаження заявок...</p>
-  if (!submissions.length) return <p style={{ color: '#888' }}>Заявок поки немає.</p>
-
-  return (
-    <div className="adm-fields">
-      {submissions.map(s => (
-        <div key={s.id} className="adm-video-row" style={{ alignItems: 'flex-start' }}>
-          <div className="adm-video-fields" style={{ flex: 1 }}>
-            <div className="adm-field">
-              <label>Ім'я</label>
-              <input type="text" value={s.name} readOnly />
-            </div>
-            <div className="adm-field">
-              <label>Email</label>
-              <input type="text" value={s.email} readOnly />
-            </div>
-            <div className="adm-field">
-              <label>Телефон</label>
-              <input type="text" value={s.phone || '—'} readOnly />
-            </div>
-            <div className="adm-field">
-              <label>Дата</label>
-              <input type="text" value={new Date(s.created_at).toLocaleString('uk-UA')} readOnly />
-            </div>
-          </div>
-          <div className="adm-video-actions">
-            <button type="button" onClick={() => removeSubmission(s.id)} className="adm-btn-delete" title="Видалити">✕</button>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function AdminPanel() {
   const [content, setContent] = useState(defaults)
   const [images, setImages] = useState(defaultImages)
@@ -383,7 +332,6 @@ function AdminPanel() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showImages, setShowImages] = useState(false)
-  const [showSubmissions, setShowSubmissions] = useState(false)
   const [products, setProducts] = useState([])
 
   useEffect(() => {
@@ -453,8 +401,8 @@ function AdminPanel() {
           {Object.keys(sectionLabels).map(key => (
             <button
               key={key}
-              className={`adm-side-btn ${activeSection === key && !showImages && !showSubmissions ? 'active' : ''}`}
-              onClick={() => { setActiveSection(key); setShowImages(false); setShowSubmissions(false) }}
+              className={`adm-side-btn ${activeSection === key && !showImages ? 'active' : ''}`}
+              onClick={() => { setActiveSection(key); setShowImages(false) }}
             >
               {sectionLabels[key]}
             </button>
@@ -462,15 +410,9 @@ function AdminPanel() {
           <div className="adm-side-divider" />
           <button
             className={`adm-side-btn ${showImages ? 'active' : ''}`}
-            onClick={() => { setShowImages(true); setShowSubmissions(false) }}
+            onClick={() => setShowImages(true)}
           >
             Зображення
-          </button>
-          <button
-            className={`adm-side-btn ${showSubmissions ? 'active' : ''}`}
-            onClick={() => { setShowSubmissions(true); setShowImages(false) }}
-          >
-            Заявки
           </button>
         </nav>
         <div className="adm-side-bottom">
@@ -482,7 +424,7 @@ function AdminPanel() {
       {/* main */}
       <main className="adm-main">
         <header className="adm-header">
-          <h1>{showSubmissions ? 'Заявки' : showImages ? 'Зображення' : sectionLabels[activeSection]}</h1>
+          <h1>{showImages ? 'Зображення' : sectionLabels[activeSection]}</h1>
           <div className="adm-header-actions">
             <button className="adm-btn-reset" onClick={handleReset}>Скинути все</button>
             <button className="adm-btn-save" onClick={handleSave} disabled={saving}>
@@ -492,9 +434,7 @@ function AdminPanel() {
         </header>
 
         <div className="adm-body">
-          {showSubmissions ? (
-            <SubmissionsManager />
-          ) : showImages ? (
+          {showImages ? (
             <div className="adm-images-grid">
               {Object.keys(imageLabels).map(key => (
                 <ImageUploader

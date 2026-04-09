@@ -23,7 +23,7 @@ export default function HomeContent({ content, images, products, videos }) {
           <HeroSection content={content} images={images} />
           <MarathonProgramSection content={content.marathon_program} />
           <MarathonFormatSection content={content.marathon_format} />
-          <SelfEsteemSection content={content.self_esteem} ctaContent={content.marathon_cta} />
+          <SelfEsteemSection ctaContent={content.marathon_cta} />
           <AboutSection content={content.about} images={images} />
           <ProductsSection content={content.products} products={products} />
           <TvSection content={content.tv} videos={videos} />
