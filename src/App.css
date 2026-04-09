@@ -1582,12 +1582,10 @@ a.btn-white {
   .hero-right { display: none; }
   .hero-mobile-photo {
     display: block;
-    width: 260px; height: 260px;
-    border-radius: 12px;
+    width: calc(100% + 4rem);
+    margin: -1rem -2rem 2rem;
+    max-height: 70vh;
     overflow: hidden;
-    margin: 0 auto 2rem;
-    border: 3px solid rgba(255,255,255,0.25);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
   .results-section { grid-template-columns: 1fr; }
   .results-content { padding: 4rem 1.5rem; }
