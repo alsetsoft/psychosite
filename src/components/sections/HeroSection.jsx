@@ -24,7 +24,7 @@ export default function HeroSection({ content, images }) {
       </div>
       <div className="hero-right">
         <Image
-          src={images.heroImage}
+          src={images.heroImageDesktop || images.heroImage}
           alt="Леся Матвєєва — психолог, психоаналітик"
           width={600}
           height={800}

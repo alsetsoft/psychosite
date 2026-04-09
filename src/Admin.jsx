@@ -82,12 +82,14 @@ const fieldLabels = {
 }
 
 const imageLabels = {
-  heroImage: 'Головне фото (Hero)',
+  heroImage: 'Фото Hero (мобільна)',
+  heroImageDesktop: 'Фото Hero (десктоп)',
   aboutImage: 'Фото "Про мене"',
 }
 
 const imageHints = {
-  heroImage: 'Рекомендовано: 1200×1600 px, портретна орієнтація (3:4)',
+  heroImage: 'Рекомендовано: портретна або квадратна орієнтація (1:1)',
+  heroImageDesktop: 'Рекомендовано: 1200×1600 px, портретна орієнтація (3:4)',
   aboutImage: 'Рекомендовано: 1200×1600 px, портретна орієнтація (3:4)',
 }
 

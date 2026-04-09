@@ -91,6 +91,7 @@ export const defaults = {
 
 export const defaultImages = {
   heroImage: '/mainimg.JPG',
+  heroImageDesktop: '/mainimg.JPG',
   aboutImage: '/secondimg.JPG',
 }
 
