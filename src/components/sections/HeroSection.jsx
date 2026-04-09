@@ -14,11 +14,12 @@ export default function HeroSection({ content, images }) {
             alt="Леся Матвєєва"
             width={300}
             height={300}
+            unoptimized
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
-        <div className="hero-tag-line">{c.tag}</div>
-        <h1>{c.title}<span>{c.subtitle}</span></h1>
+        <h1 className="hero-tag-line">{c.tag}</h1>
+        <div className="hero-title">{c.title}<span>{c.subtitle}</span></div>
         <p className="hero-subtitle"><Nl text={c.text} /></p>
         <div className="hero-star"><span className="star-spin"><Star size={70} color="rgba(255,255,255,0.9)" /></span></div>
       </div>
@@ -29,6 +30,7 @@ export default function HeroSection({ content, images }) {
           width={600}
           height={800}
           priority
+          unoptimized
           sizes="(max-width: 768px) 100vw, 50vw"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />

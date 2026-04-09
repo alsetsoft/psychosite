@@ -8,6 +8,7 @@ const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: __dirname,
   images: {
+    minimumCacheTTL: 60,
     remotePatterns: [
       {
         protocol: 'https',
